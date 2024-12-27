@@ -41,7 +41,7 @@ const handleSearch = async (
   query: string,
   setResults: (results: SearchResult[]) => void,
   setIsSearching: (isSearching: boolean) => void,
-  setRecentSearches: (recentSearches: string[]) => void
+  setRecentSearches: React.Dispatch<React.SetStateAction<string[]>>
 ) => {
   setIsSearching(true);
   const response = await fetch("/api/search", {
@@ -62,10 +62,17 @@ const handleSearch = async (
   setResults(results);
   setIsSearching(false);
 
-  setRecentSearches((prev) =>
-    prev.includes(query) ? prev : [query, ...prev.slice(0, 4)]
-  );
+  // Updating the recent searches state correctly
+  setRecentSearches((prev: string[]) => {
+    // Check if the search term is already in the recent searches
+    const updatedSearches = prev.includes(query) 
+      ? prev 
+      : [query, ...prev.slice(0, 4)];  // Keep only the last 5 recent searches
+
+    return updatedSearches;  // Return the updated state
+  });
 };
+
 
 export default function Home() {
   const [isBootstrapping, setIsBootstrapping] = useState(false);
@@ -266,3 +273,4 @@ export default function Home() {
     </div>
   );
 }
+
